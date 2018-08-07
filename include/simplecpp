@@ -1,7 +1,8 @@
 #ifndef _GRAPHICSIM_INCLUDED
 #define _GRAPHICSIM_INCLUDED
 
-#include <bits/stdc++.h>
+#include <string>
+#include <map>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -12,6 +13,7 @@
 #include <cmath>
 
 #include <GL/glew.h>
+
 #include <glm/glm.hpp>
 #include "SOIL/SOIL.h"
 #include <GL/glc.h>
