@@ -1,4 +1,9 @@
 #include <simplecpp>
+
+/* All user draw commands should be taken as specifying sizes in screen coordinate units -- not necessarily pixels.
+OpenGL expects everything (framebuffer size) to be in pixels, but windowing systems use screen coordinates (for window size, click position, etc).
+Thus, in this code, while issuing a draw call, care must be taken to ensure that the units are not mixed up. */
+
 GLuint vbo, vao,FBO, fbo=0;
 
 GLuint renderTexture, renderedTexture, depthrenderbuffer;
@@ -11,8 +16,9 @@ vector<GLuint> Gtexture;
 vector<pair<pair<int,int>, pair<int,int> > > texCoord;
 map<GLuint, vector<int> > Gtex;
 
-int screen_width;
-int screen_height;
+int sc_width, sc_height;            // In screen coordinates. Not necessarily in pixels.
+int fb_width, fb_height;            // Framebuffer size in pixels.
+
 char *title;
 GLFWwindow* window;
 
@@ -111,7 +117,7 @@ int getClick(){
 			break;
 		}
 	}
-	return xpos * 65536 + ypos;
+	return (int) xpos * 65536 + (int) ypos;
 }
 
 void loadTexture(GLuint *texture, char* path){
@@ -147,12 +153,12 @@ void createObjFBO(){
   
   glGenFramebuffers(1, &fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-  createObjTexture(screen_width, screen_height);
+  createObjTexture(fb_width, fb_height);
   glBindTexture(GL_TEXTURE_2D, renderedTexture);
   
   glGenRenderbuffers(1, &depthrenderbuffer);
   glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screen_width, screen_height);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, fb_width, fb_height);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
   
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
@@ -173,16 +179,15 @@ void unbindFBO(){
 }
 
 void config(GLFWwindow* window){
-  int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    float ratio = width / (float) height;
-    glViewport(0, 0, width, height);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+  glfwGetFramebufferSize(window, &fb_width, &fb_height);
+  float ratio = fb_width / (float) fb_height;
+  glViewport(0, 0, fb_width, fb_height);                // Uses actual pixel values
+  glClear(GL_COLOR_BUFFER_BIT);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
 }
 
 void drawRect(int x, int y, int w, int h, GLuint texture){
@@ -195,18 +200,18 @@ void drawRect(int x, int y, int w, int h, GLuint texture){
     glMatrixMode(GL_PROJECTION); 
     glLoadIdentity();
     glPushMatrix(); 
-    glOrtho(0,screen_width,0,screen_height,-1,1);
+    glOrtho(0,sc_width,0,sc_height,-1,1);       // setup the matrix so that draw call happens in screen coords.
     glPushMatrix();
     glColor3f(1.0,1.0,1.0);
     glBegin(GL_POLYGON);
         glTexCoord2i(0,0);
-        glVertex2i(x,screen_height-h);
+        glVertex2i(x,sc_height-h);
         glTexCoord2i(1,0);
-        glVertex2i(x+w,screen_height-h);
+        glVertex2i(x+w,sc_height-h);
         glTexCoord2i(1,1);
-        glVertex2i(x+w,screen_height-y);
+        glVertex2i(x+w,sc_height-y);
         glTexCoord2i(0,1);
-        glVertex2i(x,screen_height-y);
+        glVertex2i(x,sc_height-y);
     glEnd();
     glPopMatrix();
     glEnable(GL_DEPTH_TEST);
@@ -254,13 +259,13 @@ GLuint createFBO(){
 	GLuint FramebufferName = 0;
 	glGenFramebuffers(1, &FramebufferName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-	renderTexture = createTexture(screen_width, screen_height);
+	renderTexture = createTexture(fb_width, fb_height);
 	glBindTexture(GL_TEXTURE_2D, renderTexture);
 //create DepthBuffer
 	GLuint depthrenderbuffer;
 	glGenRenderbuffers(1, &depthrenderbuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screen_width, screen_height);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, fb_width, fb_height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
 //Bind color to fbo
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderTexture, 0);
@@ -295,21 +300,21 @@ void initGL(void)
 void initCanvas(const char *window_title, int width, int height){    
 	
 	display = true;
-	screen_width = width;
-	screen_height = height;
+	sc_width = width;
+	sc_height = height;
 
 	if (!glfwInit())
 	    exit(EXIT_FAILURE);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	window = glfwCreateWindow(screen_width, screen_height, window_title, NULL, NULL);
+	window = glfwCreateWindow(sc_width, sc_height, window_title, NULL, NULL);
 	if (!window)
 	{
 	    glfwTerminate();
 	    exit(EXIT_FAILURE);
 	}
-	glfwGetFramebufferSize( window, &screen_width, &screen_height );
+	glfwGetFramebufferSize( window, &fb_width, &fb_height );
 	glfwMakeContextCurrent(window);
 	glewExperimental = GL_TRUE;
 	//glfwSwapInterval(1);
@@ -333,8 +338,9 @@ void initCanvas(const char *window_title, int width, int height){
 
 void resizeCanvas(int w, int h){
 	glfwSetWindowSize(window, w, h);
-	screen_width=w;
-	screen_height=h;
+	sc_width=w;
+	sc_height=h;
+  glfwGetFramebufferSize(window, &fb_width, &fb_height);
 	repaint();
 }
 double randuv(double u, double v){
@@ -345,11 +351,11 @@ double randuv(double u, double v){
 void abort(){ std::abort(); }
 
   int canvas_width(){
-    return screen_width;
+    return sc_width;
   }
   
   int canvas_height(){
-    return screen_height;
+    return sc_height;
   }
 
   void wait(float duration){
@@ -367,7 +373,7 @@ void abort(){ std::abort(); }
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glOrtho(0, screen_width, 0, screen_height, -1.0f, 1.0f);
+    glOrtho(0, sc_width, 0, sc_height, -1.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
@@ -388,8 +394,8 @@ void abort(){ std::abort(); }
     
     glColor3f(r,g,b); 
     glBegin(GL_LINE_LOOP);
-			glVertex3f(start.x, screen_height - start.y, 0.0);
-			glVertex3f(end.x, screen_height - end.y, 0.0);
+			glVertex3f(start.x, sc_height - start.y, 0.0);
+			glVertex3f(end.x, sc_height - end.y, 0.0);
     glEnd();
    
     glPopAttrib();
@@ -439,7 +445,7 @@ void abort(){ std::abort(); }
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glOrtho(0, screen_width, 0, screen_height, -1.0f, 1.0f);
+    glOrtho(0, sc_width, 0, sc_height, -1.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
@@ -467,7 +473,7 @@ void abort(){ std::abort(); }
         float X = r_orig * cosf(theta);
         float Y = r_orig * sinf(theta);
 
-        glVertex3f(X + center.x ,screen_height -  (Y + center.y),0.0f);
+        glVertex3f(X + center.x ,sc_height -  (Y + center.y),0.0f);
     }
 
     glEnd();
@@ -484,7 +490,7 @@ void drawEllipse(XPoint center, float r_orig, float y_orig, int num_seg, Color f
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glOrtho(0, screen_width, 0, screen_height, -1.0f, 1.0f);
+    glOrtho(0, sc_width, 0, sc_height, -1.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
@@ -518,7 +524,7 @@ void drawEllipse(XPoint center, float r_orig, float y_orig, int num_seg, Color f
     for(int ii = 0; ii < num_seg; ii++) 
     { 
         //apply radius and offset
-        glVertex2f(x * r_orig + center.x, screen_height - ( y * y_orig + center.y));//output vertex 
+        glVertex2f(x * r_orig + center.x, sc_height - ( y * y_orig + center.y));//output vertex 
 
         //apply the rotation matrix
         t = x;
@@ -543,12 +549,12 @@ void drawText(){
 	glcNewFontFromFamily(myFont, "Courier");
 	glcFont(myFont);
 	glEnable(GL_LINE_SMOOTH);
-	glViewport(0, 0, screen_width, screen_height);
+	glViewport(0, 0, fb_width, fb_height);
 	glMatrixMode(GL_PROJECTION); 
 	glLoadIdentity();  
 	glPushAttrib(GL_DEPTH_TEST);
     glDisable(GL_DEPTH_TEST);        
-	glOrtho(0.0, screen_width, screen_height, 0.0, -1.0, 1.0); 
+	glOrtho(0.0, sc_width, sc_height, 0.0, -1.0, 1.0); 
 	glMatrixMode(GL_MODELVIEW); 
 	
 	glPushMatrix();	
@@ -593,7 +599,7 @@ void drawText(){
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    glOrtho(0, screen_width, 0, screen_height, -1.0f, 1.0f);
+    glOrtho(0, sc_width, 0, sc_height, -1.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
@@ -616,7 +622,7 @@ void drawText(){
     if(fill) glBegin(GL_POLYGON);
     else     glBegin(GL_LINE_LOOP);
       for(int iter=0;iter<npoints;iter++){
-      glVertex3f(points[iter].x, screen_height -  points[iter].y, 0.0);   
+      glVertex3f(points[iter].x, sc_height -  points[iter].y, 0.0);   
     }
     glEnd();
     
@@ -633,7 +639,7 @@ void drawText(){
        spriteSet.insert(t);
     }
   }
-   void addText(Text *t){
+  void addText(Text *t){
     if(t){
        textSet.insert(t);
        repaint();
@@ -644,6 +650,15 @@ void drawText(){
     if(t){
       for( iter = spriteSet.begin(); iter != spriteSet.end(); iter ++){
 	if((*iter) == t){spriteSet.erase(iter); break;}
+      } 
+    }
+    repaint();
+  }
+
+  void removeText(Text *t){
+    if(t){
+      for( std::multiset<Text *, LtSprite>::iterator t_iter = textSet.begin(); t_iter != textSet.end(); t_iter ++){
+  if((*t_iter) == t){textSet.erase(t_iter); break;}
       } 
     }
     repaint();
@@ -667,6 +682,7 @@ bool globalRepaintFlag = true;
   }
 
   void repaint(){
+    if (!globalRepaintFlag) return;
     if(!display){
       cout << "Repaint: You must first call initCanvas before using any graphics features.\n";
       exit(1);
@@ -675,11 +691,11 @@ bool globalRepaintFlag = true;
     glLoadIdentity();
     glColor3f(0,0,0);
     map<GLuint, vector<int> > :: iterator gtext_iter;
-    drawRect(0,0,screen_width,screen_height,renderedTexture);
+    drawRect(0,0,sc_width,sc_height,renderedTexture);
     if(!Gtexture.empty()){
 	
     for(gtext_iter=Gtex.begin(); gtext_iter != Gtex.end(); gtext_iter++){
-		  drawRect(gtext_iter->second[0], screen_height - gtext_iter->second[1], gtext_iter->second[2], screen_height - gtext_iter->second[3], gtext_iter->first);
+		  drawRect(gtext_iter->second[0], sc_height - gtext_iter->second[1], gtext_iter->second[2], sc_height - gtext_iter->second[3], gtext_iter->first);
 	 }
 	}
     for(iter = spriteSet.begin(); iter != spriteSet.end(); iter++){
@@ -761,7 +777,7 @@ bool globalRepaintFlag = true;
 
  void screenshot(char* filename){
  	repaint();
-	SOIL_save_screenshot(filename,1,0,0,screen_width, screen_height);
+	SOIL_save_screenshot(filename,1,0,0,fb_width, fb_height);
   }
 
 

@@ -15,6 +15,7 @@ class Text : public Sprite{
   Text(double cx, double cy, string m, Composite* owner=NULL);
   Text(double cx, double cy, double n, Composite* owner=NULL);
   Text(Composite* owner=NULL);
+  ~Text();
   void reset(double cx, double cy, string m);
   void reset(double cx, double cy, double m);
   void setMessage(string s);

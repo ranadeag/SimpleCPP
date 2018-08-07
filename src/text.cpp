@@ -21,6 +21,9 @@ Text::Text(Composite* owner)
   reset(0,0,"");
 }
 
+Text::~Text() {
+  removeText(this);
+}
 
 void Text::reset(double cx, double cy, string m){
   pose = Pose(cx,cy);

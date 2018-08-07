@@ -46,6 +46,7 @@ namespace simplecpp{
   void addSprite(Sprite *t);  // adds *t into the list of active sprites
                               // does not repaint immediately?
    
+  void removeText(Text *t);
   void removeSprite(Sprite *t);
 
   Color COLOR(const char *color_string);  // creates a colour.
