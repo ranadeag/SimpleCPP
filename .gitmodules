@@ -9,4 +9,4 @@
 	url = https://github.com/paralin/soil.git
 [submodule "external/QuesoGLC"]
 	path = external/QuesoGLC
-	url = https://github.com/Safety0ff/QuesoGLC.git
+	url = https://github.com/ranadeag/QuesoGLC.git
