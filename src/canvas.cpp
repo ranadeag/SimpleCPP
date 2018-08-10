@@ -4,27 +4,27 @@
 OpenGL expects everything (framebuffer size) to be in pixels, but windowing systems use screen coordinates (for window size, click position, etc).
 Thus, in this code, while issuing a draw call, care must be taken to ensure that the units are not mixed up. */
 
-GLuint vbo, vao,FBO, fbo=0;
+static GLuint vbo, vao,FBO, fbo=0;
 
-GLuint renderTexture, renderedTexture, depthrenderbuffer;
-GLuint depthTexture;
+static GLuint renderTexture, renderedTexture, depthrenderbuffer;
+static GLuint depthTexture;
 
-GLuint FramebufferName = 0;	
+static GLuint FramebufferName = 0;	
 
-GLFWimage image;
-vector<GLuint> Gtexture;
-vector<pair<pair<int,int>, pair<int,int> > > texCoord;
-map<GLuint, vector<int> > Gtex;
+static GLFWimage image;
+static vector<GLuint> Gtexture;
+static vector<pair<pair<int,int>, pair<int,int> > > texCoord;
+static map<GLuint, vector<int> > Gtex;
 
-int sc_width, sc_height;            // In screen coordinates. Not necessarily in pixels.
-int fb_width, fb_height;            // Framebuffer size in pixels.
+static int sc_width, sc_height;            // In screen coordinates. Not necessarily in pixels.
+static int fb_width, fb_height;            // Framebuffer size in pixels.
 
-char *title;
-GLFWwindow* window;
+static char *title;
+static GLFWwindow* window;
 
-XEvent eve;
-bool callback=false;
-bool lbutton=false;
+static XEvent eve;
+static bool callback=false;
+static bool lbutton=false;
 
 struct LtSprite
 {
@@ -33,10 +33,8 @@ struct LtSprite
   }
 };
 
-std::multiset<Sprite *, LtSprite> spriteSet;
-std::multiset<Sprite *, LtSprite>:: iterator iter;
-
-std::multiset<Text *, LtSprite> textSet;
+static std::multiset<Sprite *, LtSprite> spriteSet;
+static std::multiset<Text *, LtSprite> textSet;
 
 namespace simplecpp{
   bool display = false;
@@ -648,7 +646,7 @@ void drawText(){
 
   void removeSprite(Sprite *t){
     if(t){
-      for( iter = spriteSet.begin(); iter != spriteSet.end(); iter ++){
+      for( auto iter = spriteSet.begin(); iter != spriteSet.end(); iter ++){
 	if((*iter) == t){spriteSet.erase(iter); break;}
       } 
     }
@@ -698,7 +696,7 @@ bool globalRepaintFlag = true;
 		  drawRect(gtext_iter->second[0], sc_height - gtext_iter->second[1], gtext_iter->second[2], sc_height - gtext_iter->second[3], gtext_iter->first);
 	 }
 	}
-    for(iter = spriteSet.begin(); iter != spriteSet.end(); iter++){
+    for(auto iter = spriteSet.begin(); iter != spriteSet.end(); iter++){
 	       
   	 (*iter)->paint();
     }
@@ -708,6 +706,7 @@ bool globalRepaintFlag = true;
   }
 
   void nextEvent(XEvent &event){
+	  callback = false;  // added 9/8/18
     while(1){
     	glfwWaitEvents();
 
@@ -742,17 +741,26 @@ bool globalRepaintFlag = true;
 
   void spriteStatus(){
     cout<<"Count: "<<spriteSet.size()<<endl;
-    for( iter = spriteSet.begin(); iter != spriteSet.end(); iter ++){
+    for( auto iter = spriteSet.begin(); iter != spriteSet.end(); iter ++){
       cout<<"["<<"]-->"<<(*iter)<<endl;
     }
   }
 
   bool checkEvent(XEvent &event){
-  	glfwPollEvents();
+/*  	glfwPollEvents();
   	event = eve;
     if(event.type != 0)
       return true;
     return false;
+*/
+	  glfwPollEvents();
+	  event = eve;
+	  if(callback){
+		  callback = false;
+		  return true;
+	  }
+	  return false;
+
   }
 
    bool mouseDragEvent(XEvent &event){
