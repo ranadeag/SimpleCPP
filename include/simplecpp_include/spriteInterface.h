@@ -1,8 +1,8 @@
 #ifndef _SPRITEINTERFACE_INCLUDED_
 #define _SPRITEINTERFACE_INCLUDED_
 
-#include <common_def.h>
-#include <pose.h>
+#include "common_def.h"
+#include "pose.h"
 
 namespace simplecpp{
 

@@ -1,8 +1,8 @@
 #ifndef _RECTANGLE_INCLUDED_
 #define _RECTANGLE_INCLUDED_
 
-#include <polygon.h>
-#include <canvas.h>
+#include "polygon.h"
+#include "canvas.h"
 
 namespace simplecpp{
 class Rectangle : public Polygon{

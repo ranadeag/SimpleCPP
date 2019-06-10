@@ -5,21 +5,23 @@ This has the simplecpp package.
 
 Please do not distribute.
 
+Dependencies:
+------------
+
+Requires `cmake`, `pkgconfig`, `glew`, `fribidi`, `freetype` and `fontconfig`. Install with `brew install cmake pkgconfig glew fribidi freetype fontconfig` on a Mac, or `apt-get` etc. on Linux.
+
 Instructions for installing the simplecpp package:
-1. Copy this directory (simplecpp) somewhere.
-2. Change the directory to this, and execute
-   ./configure.sh
+1. Change the directory to this (`cd SimpleCPP`), create a build directory inside this directory (`mkdir build`), and change to the build directory (`cd build`).
+2. Run CMake (`cmake ..`)
+3. Run Make (`make -jN`) substitute `N` for the number of processors you have.
+4. Install (`make install` on Mac, or `sudo make install` on Linux).
 
-This should create simplecpp/lib/libsprite.a which is needed in
-simplecpp.  The include files will be in simplecpp/include.
+This installs a shell script s++ (and the required libraries).
 
-It should also create a shell script simplecpp/s++
-
-s++ is the compiler for use with simplecpp.  You can create an alias
-so that you dont need to give the entire filename to use s++.
+s++ is the compiler for use with simplecpp.
 
 To use simplecpp, your source files should contain
-#include <simplecpp>
+`#include <simplecpp>`. To compile, do `s++ myprogram.cpp`.
 
 ------
 

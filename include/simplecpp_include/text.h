@@ -1,7 +1,7 @@
 #ifndef _TEXT_INCLUDED_
 #define _TEXT_INCLUDED_
 
-#include <sprite.h>
+#include "sprite.h"
 
 namespace simplecpp{
 

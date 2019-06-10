@@ -6,7 +6,7 @@
 	url = https://github.com/glfw/glfw
 [submodule "external/soil"]
 	path = external/soil
-	url = https://github.com/paralin/soil.git
+	url = https://github.com/SiddhantRanade/soil.git
 [submodule "external/QuesoGLC"]
 	path = external/QuesoGLC
 	url = https://github.com/ranadeag/QuesoGLC.git

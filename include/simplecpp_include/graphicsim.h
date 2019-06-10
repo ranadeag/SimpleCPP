@@ -9,14 +9,14 @@
 #include <iostream>
 #include <unistd.h>
 
-#include <array2d.h>
-#include <sprite.h>
-#include <line.h>
-#include <point.h>
-#include <polygon.h>
-#include <keycodes.h>
-#include <turtle.h>
-#include <canvas.h>
+#include "array2d.h"
+#include "sprite.h"
+#include "line.h"
+#include "point.h"
+#include "polygon.h"
+#include "keycodes.h"
+#include "turtle.h"
+#include "canvas.h"
 
 #define MouseCode(event) ((event).xbutton.button)
 #define KeyCode(event) ((event).xkey.keycode)

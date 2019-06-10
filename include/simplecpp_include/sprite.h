@@ -1,9 +1,9 @@
 #ifndef _SPRITE_INCLUDED_
 #define _SPRITE_INCLUDED_
 
-#include <spriteInterface.h>
-#include <common_def.h>
-#include <pose.h>
+#include "spriteInterface.h"
+#include "common_def.h"
+#include "pose.h"
 
 namespace simplecpp{
 	

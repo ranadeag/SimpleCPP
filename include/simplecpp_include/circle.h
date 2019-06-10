@@ -1,7 +1,7 @@
 #ifndef _POINT_INCLUDED_
 #define _POINT_INCLUDED_
 
-#include <sprite.h>
+#include "sprite.h"
 #include <vector>
 
 namespace simplecpp{

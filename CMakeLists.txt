@@ -17,7 +17,7 @@ include (FindPkgConfig)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+set(GLFW_INSTALL ON CACHE BOOL "" FORCE)
 
 add_subdirectory(external/glfw)
 add_subdirectory(external/glm)
@@ -37,6 +37,8 @@ SET(EXECUTABLE_OUTPUT_PATH Output/bin/)
 SET(LIBRARY_OUTPUT_PATH Output/lib/)
 
 FILE(GLOB SimpleCPP_cpp ${SourceRoot}/src/*.cpp)
+FILE(GLOB SimpleCPP_h_internal ${SourceRoot}/include/simplecpp_include/*.h )
+FILE(GLOB SimpleCPP_h_public ${SourceRoot}/include/simplecpp )
 FILE(GLOB SimpleCPP_h ${SourceRoot}/include/*.h ${SourceRoot}/include/simplecpp )
 
 add_subdirectory(${ProjectRoot}/external/soil)
@@ -52,13 +54,21 @@ include_directories(
 
 ADD_LIBRARY(SimpleCPP STATIC ${SimpleCPP_cpp})
 
-target_link_libraries(SimpleCPP ${OPENGL_LIBRARIES} glfw glm ${GLEW_LIBRARIES} GLC ${FRIBIDI_LIBRARY})
-# if(NOT APPLE)
-# 	target_link_libraries(SimpleCPP ${GLEW_LIBRARIES})
-# endif(NOT APPLE)
+target_link_libraries(SimpleCPP PUBLIC ${OPENGL_LIBRARIES} glfw glm ${GLEW_LIBRARIES} GLC ${FRIBIDI_LIBRARY} SOIL)
 
-# add_executable(LineReconstructionTest ${SourceRoot}/dummy.cpp ${SimpleCPP_cpp} ${SimpleCPP_h})
-# target_link_libraries(LineReconstructionTest Eigen3::Eigen ${OPENGL_LIBRARIES} glfw ${GLEW_LIBRARIES} ${GUROBI_LIBRARIES} ${Boost_LIBRARIES} )
+set_target_properties(SimpleCPP PROPERTIES PRIVATE_HEADER "${SimpleCPP_h_internal}")
+set_target_properties(SimpleCPP PROPERTIES PUBLIC_HEADER "${SimpleCPP_h_public}")
 
-# add_executable(LineReconstruction ${SourceRoot}/main.cpp ${SimpleCPP_cpp} ${SimpleCPP_h})
-# target_link_libraries(LineReconstruction Eigen3::Eigen ${OPENGL_LIBRARIES} glfw ${GLEW_LIBRARIES} ${GUROBI_LIBRARIES} ${Boost_LIBRARIES} )
+install(
+  TARGETS SimpleCPP
+  ARCHIVE DESTINATION "lib"
+  PUBLIC_HEADER DESTINATION "include"
+  PRIVATE_HEADER DESTINATION "include/simplecpp_include" )
+
+if (APPLE)
+  install(FILES ${ProjectRoot}/tools/darwin/s++ DESTINATION "bin" 
+  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+elseif(UNIX)
+  install(FILES ${ProjectRoot}/tools/unix/s++ DESTINATION "bin" 
+  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+endif(APPLE)

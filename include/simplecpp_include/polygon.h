@@ -1,7 +1,7 @@
 #ifndef _POLYGON_INCLUDED_
 #define _POLYGON_INCLUDED_
 
-#include <sprite.h>
+#include "sprite.h"
 #include <vector>
 #include <iostream>
 

@@ -1,7 +1,7 @@
 #ifndef _ELLIPSE_INCLUDED_
 #define _ELLIPSE_INCLUDED_
 
-#include <sprite.h>
+#include "sprite.h"
 #include <vector>
 
 namespace simplecpp{

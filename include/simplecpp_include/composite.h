@@ -1,8 +1,8 @@
 #ifndef _COMPOSITE_INCLUDED_
 #define _COMPOSITE_INCLUDED_
-#include <sprite.h>
+#include "sprite.h"
 #include <vector>
-#include <pose.h>
+#include "pose.h"
 
 namespace simplecpp{
 class Composite : public Sprite{

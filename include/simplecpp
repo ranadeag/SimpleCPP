@@ -22,26 +22,23 @@
 #include <vector>
 #include <string>
 
-#include <eventcodes.h>
-
-#include <color.h>
-
-
-#include <common_def.h>
-#include <spriteInterface.h>
-#include <sprite.h>
-#include <composite.h>
-#include <line.h>
-#include <circle.h>
-#include <ellipse.h>
-#include <text.h>
-#include <rectangle.h>
-#include <polygon.h>
-#include <turtle.h>
-#include <turtleSim.h>
-#include <sim.h>
-#include <canvas.h>
-#include <ellipse.h>
+#include "simplecpp_include/eventcodes.h"
+#include "simplecpp_include/color.h"
+#include "simplecpp_include/common_def.h"
+#include "simplecpp_include/spriteInterface.h"
+#include "simplecpp_include/sprite.h"
+#include "simplecpp_include/composite.h"
+#include "simplecpp_include/line.h"
+#include "simplecpp_include/circle.h"
+#include "simplecpp_include/ellipse.h"
+#include "simplecpp_include/text.h"
+#include "simplecpp_include/rectangle.h"
+#include "simplecpp_include/polygon.h"
+#include "simplecpp_include/turtle.h"
+#include "simplecpp_include/turtleSim.h"
+#include "simplecpp_include/sim.h"
+#include "simplecpp_include/canvas.h"
+#include "simplecpp_include/ellipse.h"
 
 using namespace simplecpp;
 using simplecpp::wait;

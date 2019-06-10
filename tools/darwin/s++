@@ -1,0 +1,2 @@
+#! /bin/sh -
+exec c++ --std=c++11 -lSimpleCPP -framework OpenGL -lglfw3 -framework IOKit -framework CoreVideo -framework Cocoa -lsoil -lglew -lglc -lfribidi -lfreetype -lfontconfig "$@"

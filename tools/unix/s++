@@ -1,0 +1,2 @@
+#! /bin/sh -
+exec c++ --std=c++11 -lSimpleCPP -lGL -lGLU -lglfw3 -lX11 -lXxf86vm -lXrandr -lpthread -lXi -lsoil -lglew -lglc -lfribidi -lfreetype -lfontconfig "$@"
